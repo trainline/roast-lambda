@@ -6,7 +6,7 @@ Roast Lambda is an opinionated framework written by the engineers at [The Trainl
 
 ## Getting started
 
-Our lambda functions look slightly different to traditional AWS Lambda functions. To understand the differences (and why we chose them) read the [What's Roast Lambda?](http://todo/) section.
+Our lambda functions look slightly different to traditional AWS Lambda functions. To understand the differences (and why we chose them) read the [What's Roast Lambda?](#whats-roast-lambda) section.
 
 Here's the obligatory hello world example:
 
@@ -70,10 +70,10 @@ Our Lambda handler functions are slightly different..
 
 `({event, context, AWS, logger}) => {}`
 
-Notice that the function input is a single object rather than separate parameters. This is so that we can extend the number if inputs in the future without changing the function signature. Aside from removing the callback function we have provided two out of the box services which can be used...
+Notice that the function input is a single object rather than separate parameters. This is so that we can extend the number of inputs in the future without changing the function signature. Aside from removing the callback function we have provided two out of the box services which can be used...
 
 - AWS: This is the AWS-SDK, but it has been instrumented for you to provide tracing information to AWS X-RAY. Use this instead of `require('aws-sdk')`
-- logger: This logger has been set up to log entries to CloudWatch in a very particular way. For more details see [Logging](http://todo/) It supports all the usual methods such as `.info`, `.warn` and `.error`.
+- logger: This logger has been set up to log entries to CloudWatch in a very particular way. For more details see [Logging](#logging) It supports all the usual methods such as `.info`, `.warn` and `.error`.
 
 The context object is different from the traditional context object as well. The callback functions `.done`, `.success` and `.fail` have been removed and a few new properties have been added:
 
@@ -130,7 +130,7 @@ All lambdas log when they start and include the event data details. They also lo
 
 ## ElasticSearch Integration
 
-The source code for this project contains the code for the [Log Shipper](http://link-to-code/); a lambda function which is designed to be triggered by CloudWatch log events and which sends log entries to an ElasticSearch instance.
+The source code for this project contains the code for the [Log Shipper](https://github.com/trainline/roast-lambda/blob/master/log-shipper.js); a lambda function which is designed to be triggered by CloudWatch log events and which sends log entries to an ElasticSearch instance.
 
 It accepts a single environment variable with the key `ES_ENDPOINT` which must be set to the ElasticSearch endpoint to ship logs to. Currently this must be set-up manually.
 
