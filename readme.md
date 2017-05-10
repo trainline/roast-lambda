@@ -170,6 +170,18 @@ Most of our lambdas back AWS API Gateway resource methods. We do not usually use
 
 Here's an example request:
 
-TODO
+```
+{
+  "body-json": {},
+  "params": {
+    "path": {},
+    "querystring": {},
+    "header": {
+      "Accept": "application/json",
+      ...
+    }
+  }
+  ...
+```
 
 One of the things that we use this standard request format for is tracing across API Gateway calls. AWS currently does not have an out of the box way to support this. If a Roast Lambda receives a request with the headers `TRACE_ID` and `TRACE_PARENT_SEGMENT` it will use this information to make sure it joins logging and trace calls to the existing trace as a subsegment of the calling service segment.
