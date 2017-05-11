@@ -22,7 +22,7 @@ function runLambda(lambda, event, awsContext) {
 
   let logger = logging.createLogger({ segment });
   AWS.config.logger = awsLogging.createLogger(logger);
-
+  
   logger.info(`Function started`, event);
   
   return safePromise(() => lambda.handler({ event, context, logger, AWS }))
@@ -40,37 +40,29 @@ function runLambda(lambda, event, awsContext) {
     });
 }
 
+function startSegment(event, functionName) {
+  let traceId = _.get(event, 'params.header["TRACE-ID"]');
+  let segmentId = _.get(event, 'params.header["TRACE-PARENT-SEGMENT"]');
+  
+  let segment = new AWSXRay.Segment(functionName, traceId, segmentId);
+  AWSXRay.setSegment(segment);
+
+  return segment;
+}
+
 function closeSegment(segment, key, value) {
   segment.addMetadata(key, value);
   segment.close();
 }
 
-function startSegment(event, functionName) {
-  if (!isHttpRequest(event))
-    return createAndSetSegment(functionName);
-
-  let traceId = event.params.header['TRACE-ID'];
-  let segmentId = event.params.header['TRACE-PARENT-SEGMENT'];
-  
-  return createAndSetSegment(functionName, traceId, segmentId);
-}
-
-function createAndSetSegment(functionName, traceId, segmentId) {
-  let segment = new AWSXRay.Segment(functionName, traceId, segmentId);
-  AWSXRay.setSegment(segment);
-  return segment;
-}
-
-function isHttpRequest(request) {
-  return request && request.params && request.params.header;
-}
-
 function getContextData(awsContext) {
   let context = JSON.parse(JSON.stringify(awsContext));
   let fnArnParts = context.invokedFunctionArn.split(':');
+  
   context.awsAccountId = fnArnParts[4];
   context.awsRegion = fnArnParts[3];
   context.env = process.env;
+
   return context;
 }
 
