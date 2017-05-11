@@ -5,7 +5,7 @@ let assert = require('assert');
 let logging = require('../src/logging.js');
 let awsLogging = require('../src/aws-logging.js');
 
-describe('default logger', () => {
+describe('logging', () => {
   let logger, lastEntry;
 
   let segment = { name: 'testService', id: '1', trace_id: 'xyz' };
@@ -16,60 +16,64 @@ describe('default logger', () => {
     logger = logging.createLogger({ segment, logFn });
   });
 
-  it('should log simple messages', () => {
-    let testMessage = 'sampleMessage';
-    logger.log(testMessage);
-    assert.ok(lastEntry.entry === testMessage);
-  });
+  describe('default logger', () => {
 
-  let logLevels = ['error', 'warn', 'info', 'debug'];
-
-  logLevels.forEach((level) => {
-    it(`should log ${level} logs`, () => {
-      logger[level]('message');
-      assert.ok(lastEntry.level === level);
+    it('should log simple messages', () => {
+      let testMessage = 'sampleMessage';
+      logger.log(testMessage);
+      assert.ok(lastEntry.entry === testMessage);
     });
-  });
 
-  it('should log the service name and segment details', () => {
-    logger.log('message');
-    assert.ok(lastEntry['service-name'] === segment.name);
-    assert.ok(lastEntry['segment-id'] === segment.id);
-    assert.ok(lastEntry['trace-id'] === segment.trace_id);
-  });
+    let logLevels = ['error', 'warn', 'info', 'debug'];
 
-  it('should log the source as "service" by default', () => {
-    logger.log('message');
-    assert.ok(lastEntry.source === 'service');
-  });
+    logLevels.forEach((level) => {
+      it(`should log ${level} logs`, () => {
+        logger[level]('message');
+        assert.ok(lastEntry.level === level);
+      });
+    });
 
-  it('should not log details by default', () => {
-    logger.log('message');
-    assert.ok(lastEntry.details === undefined);
-  });
+    it('should log the service name and segment details', () => {
+      logger.log('message');
+      assert.ok(lastEntry['service-name'] === segment.name);
+      assert.ok(lastEntry['segment-id'] === segment.id);
+      assert.ok(lastEntry['trace-id'] === segment.trace_id);
+    });
 
-  it('should log details when supplied', () => {
-    let details = 'test details';
-    logger.log('message', details);
-    assert.ok(lastEntry.details === details);
-  });
+    it('should log the source as "service" by default', () => {
+      logger.log('message');
+      assert.ok(lastEntry.source === 'service');
+    });
 
-  it('should json serialise complex details', () => {
-    let details = { key: 'value' };
-    logger.log('message', details);
-    assert.deepEqual(JSON.parse(lastEntry.details), details);
-  });
+    it('should not log details by default', () => {
+      logger.log('message');
+      assert.ok(lastEntry.details === undefined);
+    });
 
-  it('should log attributes when supplied', () => {
-    let testAttributeValue = 'value';
-    logger.log('message', null, { attr: testAttributeValue });
-    assert.ok(lastEntry.attr === testAttributeValue);
-  });
+    it('should log details when supplied', () => {
+      let details = 'test details';
+      logger.log('message', details);
+      assert.ok(lastEntry.details === details);
+    });
 
-  it('should json serialise complex messages', () => {
-    let testObject = { key: 'value' };
-    logger.log(testObject);
-    assert.ok(JSON.parse(lastEntry.entry).key === testObject.key);
+    it('should json serialise complex details', () => {
+      let details = { key: 'value' };
+      logger.log('message', details);
+      assert.deepEqual(JSON.parse(lastEntry.details), details);
+    });
+
+    it('should log attributes when supplied', () => {
+      let testAttributeValue = 'value';
+      logger.log('message', null, { attr: testAttributeValue });
+      assert.ok(lastEntry.attr === testAttributeValue);
+    });
+
+    it('should json serialise complex messages', () => {
+      let testObject = { key: 'value' };
+      logger.log(testObject);
+      assert.ok(JSON.parse(lastEntry.entry).key === testObject.key);
+    });
+
   });
 
   describe('aws logger', () => {
