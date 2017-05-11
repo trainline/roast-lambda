@@ -41,4 +41,4 @@ Specifically the adapter adds:
 - Inter-micro-service event tracing using AWS X-Ray
 - Extended context info and easy access to environment variables
 
-For more information see our [docs](https://github.com/trainline/roast-lambda/docs).
+For more information see our [docs](https://github.com/trainline/roast-lambda/tree/master/docs).
