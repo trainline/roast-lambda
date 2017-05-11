@@ -5,8 +5,8 @@ let _ = require('lodash');
 let AWSXRay = require('aws-xray-sdk');
 let AWS = AWSXRay.captureAWS(require('aws-sdk'));
 
-let loggerFactory = require('./logger');
-let awsLoggerFactory = require('./aws-logger');
+let logging = require('./logging');
+let awsLogging = require('./aws-logging');
 
 let { safePromise, parseError } = require('./utils');
 
@@ -20,8 +20,8 @@ function runLambda(lambda, event, awsContext) {
 
   segment.addMetadata('Event', event);
 
-  let logger = loggerFactory.createLogger({ segment });
-  AWS.config.logger = awsLoggerFactory.createLogger(logger);
+  let logger = logging.createLogger({ segment });
+  AWS.config.logger = awsLogging.createLogger(logger);
 
   logger.info(`Function started`, event);
   
