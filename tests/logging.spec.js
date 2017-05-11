@@ -3,8 +3,9 @@
 
 let assert = require('assert');
 let logging = require('../src/logging.js');
+let awsLogging = require('../src/aws-logging.js');
 
-describe('logger', () => {
+describe('default logger', () => {
   let logger, lastEntry;
 
   let segment = { name: 'testService', id: '1', trace_id: 'xyz' };
@@ -69,5 +70,25 @@ describe('logger', () => {
     let testObject = { key: 'value' };
     logger.log(testObject);
     assert.ok(JSON.parse(lastEntry.entry).key === testObject.key);
+  });
+
+  describe('aws logger', () => {
+    let awsLogger;
+
+    beforeEach(() => awsLogger = awsLogging.createLogger(logger));
+
+    let logLevels = ['error', 'warn', 'info', 'debug'];
+
+    logLevels.forEach((level) => {
+      it(`should log ${level} logs`, () => {
+        awsLogger[level]('message');
+        assert.ok(lastEntry.level === level);
+      });
+    });
+
+    it('should log the source as "aws-sdk"', () => {
+      awsLogger.log('message');
+      assert.ok(lastEntry.source === 'aws-sdk');
+    });
   });
 });
