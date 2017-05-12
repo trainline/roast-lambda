@@ -1,5 +1,7 @@
 # Roast Lambda
 
+![Build status](https://travis-ci.org/trainline/roast-lambda.svg?branch=master)
+
 Roast Lambda is an opinionated framework written by the engineers at [The Trainline](https://engineering.thetrainline.com/) which makes writing NodeJS AWS Lambda functions easier and which facilitates best practices when building micro-service based serverless solutions.
 
 *Note: Roast Lambda is currently in development and should be considered unstable until v1. We are currently testing this approach with our own internal services.*
