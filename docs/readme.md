@@ -6,7 +6,7 @@ We're not big fans of callbacks. With AWS Lambda functions you either use the pr
 
 Our lambda function handlers just return a promise. If it resolves, the execution was successful. If it rejects, the execution failed. It's that simple.
 
-```
+```js
 exports.handler = () => {
   return doAsyncThing()
     .then(doSomethingElse);
@@ -42,7 +42,7 @@ The context object is different from the traditional context object as well. The
 
 Here is an example lambda function which makes use of these services to output all movies from a DynamoDb table in the same AWS Region:
 
-```
+```js
 exports.handler = ({ context, logger, AWS }) => {
   logger.log('Fetching movies');
   let dynamo = new AWS.DynamoDB.DocumentClient({ region: context.awsRegion });
@@ -54,7 +54,7 @@ exports.handler = ({ context, logger, AWS }) => {
 
 The logger service methods support 3 parameters: `message`, `details` and `attributes`. The following example lambda logs the fact that it is starting (the message), includes the event data so that users can see the input to the function (the details), and provides the host AWS region (one attribute)...
 
-```
+```js
 exports.handler = ({ event, context, logger }) => {
   logger.log('Function started.', event, { region: context.awsRegion });
 }
@@ -73,7 +73,7 @@ In addition to the supplied parameters, a log entry is always recorded with the 
 
 Here is an example of the log structure generated:
 
-```
+```json
 {
   "level": "info",
   "entry": "Function started",
@@ -129,7 +129,7 @@ Most of our lambdas back AWS API Gateway resource methods. We do not usually use
 
 Here's an example request:
 
-```
+```json
 {
   "body-json": {},
   "params": {

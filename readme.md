@@ -12,18 +12,19 @@ Our lambda functions look slightly different to traditional AWS Lambda functions
 
 Here's the obligatory hello world example:
 
-```
+```js
 exports.handler = () => Promise.resolve('Hello World');
 ```
 
 Create the node module above with the name 'hello-world.js'. Next we need to convert this to a Lambda that AWS will recognise. Start by installing the framework as a dependency..
-```
+
+```sh
 npm install roast-lambda --save
 ```
 
 Roast your lambda in the oven, and then serve...
 
-```
+```js
 let rl = require('roast-lambda');
 let lambda = require('./hello-world.js');
 
