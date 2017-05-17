@@ -78,7 +78,7 @@ module.exports = {
   init: (lambda) => {
     return (event, context, callback) => {
       if (keepLambdaRunning(event))
-        return Promise.resolve('No Action Taken.');
+         return Promise.resolve(callback(null, 'No Action Taken.'));
 
       return runLambda(lambda, event, context)
         .then(result => callback(null, result))

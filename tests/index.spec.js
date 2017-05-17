@@ -14,16 +14,18 @@ describe('Roast Lambda Runner', () => {
       invokedFunctionArn: 'a:b:c:d:e:f'
   };
   let cooked;
+  let spy = {};
 
   beforeEach(() => {
     cooked = roast.init(lambda);
   });
 
   it('should return no action taken when told to keep running', (done) => {
-    cooked(event, awsContext, () => {})
-        .then(result => {
-            assert.ok(result === 'No Action Taken.');
-        })
-        .then(done);
+    cooked(event, awsContext, (err, result) => {
+        spy.result = result;
+    }).then(result => {
+        assert.equal(spy.result, "No Action Taken.");
+        done();
+    });
   });
 });
