@@ -41,8 +41,8 @@ function runLambda(lambda, event, awsContext) {
 }
 
 function startSegment(event, functionName) {
-  let traceId = _.get(event, 'params.header["TRACE-ID"]');
-  let segmentId = _.get(event, 'params.header["TRACE-PARENT-SEGMENT"]');
+  let traceId = _.get(event, 'headers["TRACE-ID"]');
+  let segmentId = _.get(event, 'headers["TRACE-PARENT-SEGMENT"]');
   
   let segment = new AWSXRay.Segment(functionName, traceId, segmentId);
   AWSXRay.setSegment(segment);
