@@ -1,6 +1,6 @@
 {
   "name": "roast-lambda",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Makes writing NodeJS AWS Lambda functions easier",
   "main": "src/index.js",
   "scripts": {
@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/trainline/roast-lambda",
   "dependencies": {
-    "aws-xray-sdk": "^1.1.0",
+    "aws-xray-sdk-core": "^1.1.1",
     "lodash": "^4.17.4"
   },
   "devDependencies": {

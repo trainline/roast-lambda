@@ -2,7 +2,7 @@
 let process = require('process');
 let _ = require('lodash');
 
-let AWSXRay = require('aws-xray-sdk');
+let AWSXRay = require('aws-xray-sdk-core');
 let AWS = AWSXRay.captureAWS(require('aws-sdk'));
 
 let logging = require('./logging');
