@@ -27,16 +27,18 @@ function runLambda(lambda, event, awsContext) {
   
   return safePromise(() => lambda.handler({ event, context, logger, AWS }))
     .then((result) => {
-      logger.info(`Function completed`, result);
+      let message = `Function completed successfully`;
+      logger.info(message, result);
       closeSegment(segment, 'Result', result);
-      return result;
+      return message;
     })
     .catch((error) => {
       let err = parseError(error);
-      logger.error(`Function failed: ${err.message}`, err.errorData);
+      let message = `Function failed: ${err.message}`;
+      logger.error(message, err.errorData);
       segment.error = true;
       closeSegment(segment, 'Error', err.errorData);
-      return Promise.reject(error);
+      return Promise.reject(message);
     });
 }
 
