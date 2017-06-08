@@ -31,7 +31,7 @@ function createLogger({ segment, logFn }) {
     info:  (...args) => log('info',  ...args),
     log:   (...args) => log('info',  ...args),
     debug: (...args) => log('debug', ...args),
-    segment: { id: segment.id, traceId: segment.trace_id }
+    segment
   };
 }
 

@@ -3,6 +3,8 @@ let process = require('process');
 let _ = require('lodash');
 
 let AWSXRay = require('aws-xray-sdk-core');
+AWSXRay.enableManualMode();
+
 let AWS = AWSXRay.captureAWS(require('aws-sdk'));
 
 let logging = require('./logging');
@@ -13,15 +15,8 @@ let { safePromise, parseError } = require('./utils');
 function runLambda(lambda, event, awsContext) {
   let context = getContextData(awsContext);
 
-  let segment = startSegment(event, context.functionName);
-  
-  _.forIn(lambda.xRaySegmentAnnotations,
-    (value, key) => segment.addAnnotation(key, value));
-
-  segment.addMetadata('Event', event);
-
+  let segment = startSegment(event, context.functionName, lambda.xRaySegmentAnnotations);
   let logger = logging.createLogger({ segment });
-  AWS.config.logger = awsLogging.createLogger(logger);
   
   logger.info(`Function started`, event);
   
@@ -30,7 +25,7 @@ function runLambda(lambda, event, awsContext) {
       let message = `Function completed successfully`;
       logger.info(message, result);
       closeSegment(segment, 'Result', result);
-      return message;
+      return result || message;
     })
     .catch((error) => {
       let err = parseError(error);
@@ -42,13 +37,17 @@ function runLambda(lambda, event, awsContext) {
     });
 }
 
-function startSegment(event, functionName) {
+function startSegment(event, functionName, xRaySegmentAnnotations) {
   let traceId = _.get(event, 'headers["TRACE-ID"]');
   let segmentId = _.get(event, 'headers["TRACE-PARENT-SEGMENT"]');
   
   let segment = new AWSXRay.Segment(functionName, traceId, segmentId);
-  AWSXRay.setSegment(segment);
+  
+  _.forIn(xRaySegmentAnnotations,
+    (value, key) => segment.addAnnotation(key, value));
 
+  segment.addMetadata('Event', event);
+  
   return segment;
 }
 
@@ -61,7 +60,7 @@ function getContextData(awsContext) {
   let context = JSON.parse(JSON.stringify(awsContext));
   let fnArnParts = context.invokedFunctionArn.split(':');
   
-  context.awsAccountId = fnArnParts[4];
+  context.awsAccountId = Number(fnArnParts[4]);
   context.awsRegion = fnArnParts[3];
   context.env = process.env;
 
