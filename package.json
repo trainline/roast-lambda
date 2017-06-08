@@ -1,6 +1,6 @@
 {
   "name": "roast-lambda",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Makes writing NodeJS AWS Lambda functions easier",
   "main": "src/index.js",
   "scripts": {
