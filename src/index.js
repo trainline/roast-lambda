@@ -3,9 +3,7 @@ let process = require('process');
 let _ = require('lodash');
 
 let AWSXRay = require('aws-xray-sdk-core');
-AWSXRay.enableManualMode();
-
-let AWS = AWSXRay.captureAWS(require('aws-sdk'));
+let AWS = require('aws-sdk');
 
 let logging = require('./logging');
 let awsLogging = require('./aws-logging');
