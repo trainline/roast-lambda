@@ -3,7 +3,7 @@
 
 let AWSXRay = require('aws-xray-sdk-core');
 
-function create() {
+function createService() {
   function createSegment(name, parentTraceId, parentSegmentId) {
     return new AWSXRay.Segment(name, parentTraceId, parentSegmentId);
   }
@@ -11,4 +11,4 @@ function create() {
   return { createSegment };
 }
 
-module.exports = { create };
+module.exports = { createService };
