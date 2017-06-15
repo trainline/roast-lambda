@@ -79,7 +79,7 @@ describe('logging', () => {
   });
 
   it('should create a new logger with new segment when createSubLogger is called', () => {
-    let subLogger = logger.createSubLogger({ event: 'subEvent' });
+    let subLogger = logger.createSubLogger({ segmentName: 'subService', event: 'subEvent' });
     assert.ok(logger != subLogger);
     assert.ok(mockTraceService.segmentsCreated.length === 2);
     assert.ok(mockTraceService.segmentsCreated[0] != mockTraceService.segmentsCreated[1]);

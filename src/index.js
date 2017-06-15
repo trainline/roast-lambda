@@ -15,13 +15,15 @@ function runLambda(lambda, event, awsContext) {
     segmentName: context.functionName,
     segmentAnnotations: lambda.xRaySegmentAnnotations,
     parentSegmentDetails: {
-      traceId: _.get(event, 'headers["TRACE-ID"]'),
-      segmentId: _.get(event, 'headers["TRACE-PARENT-SEGMENT"]')
+      trace_id: _.get(event, 'headers["TRACE-ID"]'),
+      id: _.get(event, 'headers["TRACE-PARENT-SEGMENT"]')
     },
     event: event,
     logFn: console.log,
     traceService: tracing.createService()
   });
+
+  logger.info(`Function started`, event);
   
   return safePromise(() => lambda.handler({ event, context, logger, AWS }))
     .then((result) => {

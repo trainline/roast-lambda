@@ -5,7 +5,7 @@ let _ = require('lodash');
 
 function createLogger({ segmentName, traceAnnotations, parentSegmentDetails, event, logFn, traceService }) {
   let parentSegment = Object.assign({}, parentSegmentDetails);
-  let segment = traceService.createSegment(segmentName, parentSegment.trace_id, parentSegment.segment_id);
+  let segment = traceService.createSegment(segmentName, parentSegment.trace_id, parentSegment.id);
   
   segment.addMetadata('Event', event);
   _.forIn(traceAnnotations, (value, key) => segment.addAnnotation(key, value));
@@ -21,7 +21,7 @@ function createLogger({ segmentName, traceAnnotations, parentSegmentDetails, eve
       'source': 'service'
     };
 
-    if (attrs) Object.assign(logEntry, attrs);    
+    if (attrs) Object.assign(logEntry, attrs);
     logFn(JSON.stringify(logEntry, null, 2));
   }
 
@@ -32,7 +32,7 @@ function createLogger({ segmentName, traceAnnotations, parentSegmentDetails, eve
 
   function createSubLogger(args) {
     return createLogger({
-      segmentName: segmentName,
+      segmentName: args.segmentName,
       traceAnnotations: traceAnnotations,
       parentSegmentDetails: segment,
       event: args.event,
