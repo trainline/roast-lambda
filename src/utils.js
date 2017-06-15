@@ -5,13 +5,8 @@ let _ = require('lodash');
 
 function safePromise(fn) {
   return new Promise((resolve, reject) => {
-    try {
-      fn()
-        .then(result => resolve(result))
-        .catch(error => reject(error));
-    } catch (error) {
-      reject(error);
-    }
+    try { fn().then(result => resolve(result)).catch(error => reject(error)); }
+    catch (error) { reject(error); }
   });
 }
 

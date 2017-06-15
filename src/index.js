@@ -2,56 +2,41 @@
 let process = require('process');
 let _ = require('lodash');
 
-let AWSXRay = require('aws-xray-sdk-core');
 let AWS = require('aws-sdk');
 
 let logging = require('./logging');
-let awsLogging = require('./aws-logging');
-
+let tracing = require('./tracing')
 let { safePromise, parseError } = require('./utils');
 
 function runLambda(lambda, event, awsContext) {
   let context = getContextData(awsContext);
 
-  let segment = startSegment(event, context.functionName, lambda.xRaySegmentAnnotations);
-  let logger = logging.createLogger({ segment });
-  
-  logger.info(`Function started`, event);
+  let logger = logging.createLogger({
+    segmentName: context.functionName,
+    segmentAnnotations: lambda.xRaySegmentAnnotations,
+    parentSegmentDetails: {
+      traceId: _.get(event, 'headers["TRACE-ID"]'),
+      segmentId: _.get(event, 'headers["TRACE-PARENT-SEGMENT"]')
+    },
+    event: event,
+    logFn: console.log,
+    traceService: tracing.createService()
+  });
   
   return safePromise(() => lambda.handler({ event, context, logger, AWS }))
     .then((result) => {
       let message = `Function completed successfully`;
       logger.info(message, result);
-      closeSegment(segment, 'Result', result);
+      logger.close('Result', result);
       return result || message;
     })
     .catch((error) => {
       let err = parseError(error);
       let message = `Function failed: ${err.message}`;
       logger.error(message, err.errorData);
-      segment.error = true;
-      closeSegment(segment, 'Error', err.errorData);
+      logger.close('Error', err.errorData);
       return Promise.reject(message);
     });
-}
-
-function startSegment(event, functionName, xRaySegmentAnnotations) {
-  let traceId = _.get(event, 'headers["TRACE-ID"]');
-  let segmentId = _.get(event, 'headers["TRACE-PARENT-SEGMENT"]');
-  
-  let segment = new AWSXRay.Segment(functionName, traceId, segmentId);
-  
-  _.forIn(xRaySegmentAnnotations,
-    (value, key) => segment.addAnnotation(key, value));
-
-  segment.addMetadata('Event', event);
-  
-  return segment;
-}
-
-function closeSegment(segment, key, value) {
-  segment.addMetadata(key, value);
-  segment.close();
 }
 
 function getContextData(awsContext) {

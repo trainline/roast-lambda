@@ -3,8 +3,12 @@
 
 let _ = require('lodash');
 
-function createLogger({ segment, logFn }) {
-  let write = logFn || console.log;
+function createLogger({ segmentName, traceAnnotations, parentSegmentDetails, event, logFn, traceService }) {
+  let parentSegment = Object.assign({}, parentSegmentDetails);
+  let segment = traceService.createSegment(segmentName, parentSegment.trace_id, parentSegment.segment_id);
+  
+  segment.addMetadata('Event', event);
+  _.forIn(traceAnnotations, (value, key) => segment.addAnnotation(key, value));
 
   function log (level, entry, details, attrs) {
     let logEntry = {
@@ -18,11 +22,23 @@ function createLogger({ segment, logFn }) {
     };
 
     if (attrs) Object.assign(logEntry, attrs);    
-    write(JSON.stringify(logEntry, null, 2));
+    logFn(JSON.stringify(logEntry, null, 2));
   }
 
-  function json(val) {
-    return _.isObjectLike(val) ? JSON.stringify(val, null, 2) : val;
+  function closeSegment(key, value) {
+    segment.addMetadata(key, value);
+    segment.close();
+  }
+
+  function createSubLogger(args) {
+    return createLogger({
+      segmentName: segmentName,
+      traceAnnotations: traceAnnotations,
+      parentSegmentDetails: segment,
+      event: args.event,
+      logFn: logFn,
+      traceService
+    });
   }
 
   return {
@@ -31,8 +47,13 @@ function createLogger({ segment, logFn }) {
     info:  (...args) => log('info',  ...args),
     log:   (...args) => log('info',  ...args),
     debug: (...args) => log('debug', ...args),
-    segment
+    close: closeSegment,
+    createSubLogger: createSubLogger
   };
+}
+
+function json(val) {
+  return _.isObjectLike(val) ? JSON.stringify(val, null, 2) : val;
 }
 
 module.exports = { createLogger };
